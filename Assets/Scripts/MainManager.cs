@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainManager : MonoBehaviour
 {
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
@@ -18,10 +20,19 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
+    public static string playernamestr;
+
+    public Text bestScoreName;
+
+    public int bestScoreValue;
+    public Text bestScoreText;
+
     // Start is called before the first frame update
     void Start()
     {
+
+        bestScoreName.text = playernamestr;
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -40,6 +51,9 @@ public class MainManager : MonoBehaviour
 
     private void Update()
     {
+
+        bestScoreText.text = bestScoreValue.ToString();
+
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -60,6 +74,7 @@ public class MainManager : MonoBehaviour
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
+
     }
 
     void AddPoint(int point)
@@ -72,5 +87,38 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (m_Points > bestScoreValue)
+        {
+            bestScoreValue += m_Points;
+        }
+    }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public int bestScoreValue;
+    }
+
+    public void SaveScore()
+    {
+        SaveData data = new SaveData();
+        data.bestScoreValue = bestScoreValue;
+
+        string json = JsonUtility.ToJson(data);
+
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadScore()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            bestScoreValue = data.bestScoreValue;
+        }
     }
 }
