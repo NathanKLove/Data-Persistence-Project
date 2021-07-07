@@ -12,23 +12,9 @@ public class MenuUIHandler : MonoBehaviour
 
     public InputField playername;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-   
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void StartNew()
     {
         SceneManager.LoadScene(1);
-
-
     }
 
     public void Exit()
@@ -38,8 +24,6 @@ public class MenuUIHandler : MonoBehaviour
 # else
         Application.Quiz();
 #endif
-
-        //MainManager.Instance.SaveColor();
     }
 
     public void SetName()

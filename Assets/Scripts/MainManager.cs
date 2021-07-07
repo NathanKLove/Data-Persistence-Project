@@ -21,6 +21,7 @@ public class MainManager : MonoBehaviour
     private bool m_GameOver = false;
 
     public static string playernamestr;
+    public Text PlayerName;
 
     public Text bestScoreName;
 
@@ -31,7 +32,7 @@ public class MainManager : MonoBehaviour
     void Start()
     {
 
-        bestScoreName.text = playernamestr;
+        PlayerName.text = playernamestr;
 
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
@@ -47,6 +48,9 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        LoadScore();
+        //LoadName();
     }
 
     private void Update()
@@ -90,20 +94,26 @@ public class MainManager : MonoBehaviour
 
         if (m_Points > bestScoreValue)
         {
-            bestScoreValue += m_Points;
+            bestScoreValue = m_Points;
+            bestScoreName.text = PlayerName.text;
+            SaveScore();
+            //SaveName();
         }
+
     }
 
     [System.Serializable]
     class SaveData
     {
         public int bestScoreValue;
+        public Text bestScoreName;
     }
 
     public void SaveScore()
     {
         SaveData data = new SaveData();
         data.bestScoreValue = bestScoreValue;
+        //data.bestScoreName = bestScoreName;
 
         string json = JsonUtility.ToJson(data);
 
@@ -119,6 +129,32 @@ public class MainManager : MonoBehaviour
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
             bestScoreValue = data.bestScoreValue;
+            //bestScoreName = data.bestScoreName;
         }
     }
+
+    public void SaveName()
+    {
+        SaveData data = new SaveData();
+        //data.bestScoreValue = bestScoreValue;
+        data.bestScoreName = bestScoreName;
+
+        string json = JsonUtility.ToJson(data);
+
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadName()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            //bestScoreValue = data.bestScoreValue;
+            bestScoreName = data.bestScoreName;
+        }
+    }
+
 }
